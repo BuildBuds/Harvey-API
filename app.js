@@ -13,12 +13,24 @@ var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var cfenv      = require('cfenv');
+var cors       = require('cors');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+var whitelist = ['https://give.mybluemix.net'];
+// var whitelist = ['https://give.mybluemix.net', 'http://localhost:8080'];
+var corsOptions = {
+  origin: function (ori, callback) {
+    if (whitelist.indexOf(ori) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
 
 // var port = process.env.PORT || 8080;        // set our port
 // var appEnv = cfenv.getAppEnv();
@@ -58,12 +70,12 @@ router.use(function(req, res, next) {
 });
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
-router.get('/', function(req, res) {
+router.get('/', cors(corsOptions), function(req, res) {
   res.json({ message: 'hooray! welcome to our api!' });
 });
 
 // Messy, duplicate code but w/e
-router.get('/all', function(req, res) {
+router.get('/all', cors(corsOptions), function(req, res) {
   db_all.get('all', function(err, result) {
     if (err) {
       console.log(err);
@@ -75,7 +87,7 @@ router.get('/all', function(req, res) {
   });
 });
 
-router.get('/hh', function(err, res) {
+router.get('/hh', cors(corsOptions), function(err, res) {
   db_all.get('hh', function(err, result) {
     if (err) {
       console.log(err);

@@ -2,4 +2,11 @@
 applications:
  - name: Harvey
    random-route: false
-   memory: 256M
+   memory: 64M
+   buildpack: sdk-for-nodejs
+   services:
+     - Cloudant-NoSQL-DB-Harvey
+declared-services:
+  cloudant-nodejs:
+    label: cloudantNoSQLDB
+    plan: Shared
