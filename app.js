@@ -15,13 +15,17 @@ var bodyParser = require('body-parser');
 var cfenv      = require('cfenv');
 var cors       = require('cors');
 
+// Cache me out bih
+// TODO update routinely to check for updated db
+var allData;
+var hhData;
+
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var whitelist = ['https://give.mybluemix.net'];
-// var whitelist = ['https://give.mybluemix.net', 'http://localhost:8080'];
+var whitelist = ['http://give.mybluemix.net', 'https://give.mybluemix.net', 'http://localhost:8080', 'http://localhost:3000'];
 var corsOptions = {
   origin: function (ori, callback) {
     if (whitelist.indexOf(ori) !== -1) {
@@ -64,9 +68,9 @@ var router = express.Router();              // get an instance of the express Ro
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
-    // do logging
-    console.log('Something is happening.');
-    next(); // make sure we go to the next routes and don't stop here
+  // do logging
+  console.log('Something is happening.');
+  next(); // make sure we go to the next routes and don't stop here
 });
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
@@ -76,27 +80,37 @@ router.get('/', cors(corsOptions), function(req, res) {
 
 // Messy, duplicate code but w/e
 router.get('/all', cors(corsOptions), function(req, res) {
-  db_all.get('all', function(err, result) {
-    if (err) {
-      console.log(err);
-    }
+  if (allData !== undefined) { res.json({'res': allData}); }
 
-    else {
-      res.json({'res': result['contents']});
-    }
-  });
+  else {
+    db_all.get('all', function(err, result) {
+      if (err) {
+        console.log(err);
+      }
+
+      else {
+        allData = result['contents'];
+        res.json({'res': result['contents']});
+      }
+    });
+  }
 });
 
 router.get('/hh', cors(corsOptions), function(err, res) {
-  db_all.get('hh', function(err, result) {
-    if (err) {
-      console.log(err);
-    }
+  if (hhData !== undefined) { res.json({'res': hhData}); }
 
-    else {
-      res.json({'res': result['contents']});
-    }
-  });
+  else {
+    db_all.get('hh', function(err, result) {
+      if (err) {
+        console.log(err);
+      }
+
+      else {
+        hhData = result['contents'];
+        res.json({'res': result['contents']});
+      }
+    });
+  }
 });
 
 // REGISTER OUR ROUTES -------------------------------
