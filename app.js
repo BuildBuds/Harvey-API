@@ -19,6 +19,7 @@ var cors       = require('cors');
 // TODO update routinely to check for updated db
 var allData;
 var hhData;
+var hiData;
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -89,8 +90,8 @@ router.get('/all', cors(corsOptions), function(req, res) {
       }
 
       else {
-        allData = result['contents'];
-        res.json({'res': result['contents']});
+        allData = result['content'];
+        res.json({'res': result['content']});
       }
     });
   }
@@ -106,8 +107,25 @@ router.get('/hh', cors(corsOptions), function(err, res) {
       }
 
       else {
-        hhData = result['contents'];
-        res.json({'res': result['contents']});
+        hhData = result['content'];
+        res.json({'res': result['content']});
+      }
+    });
+  }
+});
+
+router.get('/hi', cors(corsOptions), function(err, res) {
+  if (hiData !== undefined) { res.json({'res': hiData}); }
+
+  else {
+    db_all.get('hi', function(err, result) {
+      if (err) {
+        console.log(err);
+      }
+
+      else {
+        hiData = result['content'];
+        res.json({'res': result['content']});
       }
     });
   }
